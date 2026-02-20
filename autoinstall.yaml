@@ -1,0 +1,133 @@
+#cloud-config
+# ============================================================
+# UBUNTU SERVER AUTOINSTALL — SETUP PERSONAL
+# ============================================================
+
+autoinstall:
+  version: 1
+
+  # ==========================================================
+  # LOCALIZACIÓN
+  # ==========================================================
+  locale: es_CL.UTF-8
+  timezone: America/Santiago
+
+  keyboard:
+    layout: latam
+
+  # ==========================================================
+  # IDENTIDAD
+  # ==========================================================
+  identity:
+    hostname: personal-ubuntu
+    username: antocreed777
+    # Generar con: mkpasswd -m sha-512
+    password: "$6$REEMPLAZAR_POR_HASH_REAL"
+
+  # ==========================================================
+  # APT CONFIGURATION
+  # ==========================================================
+  apt:
+    primary:
+      - arches: [default]
+        uri: http://archive.ubuntu.com/ubuntu
+
+    sources:
+      universe:
+        source: |
+          deb http://archive.ubuntu.com/ubuntu $RELEASE universe
+          deb http://archive.ubuntu.com/ubuntu $RELEASE-updates universe
+          deb http://security.ubuntu.com/ubuntu $RELEASE-security universe
+
+    updates: security
+
+  # ==========================================================
+  # SSH
+  # ==========================================================
+  ssh:
+    install-server: true
+    allow-pw: true
+
+  # ==========================================================
+  # PAQUETES
+  # ==========================================================
+  packages:
+
+    # ===============================
+    # GUI
+    # ===============================
+    - ubuntu-desktop-minimal
+
+    # ===============================
+    # SISTEMA BASE
+    # ===============================
+    - ca-certificates
+    - gnupg
+    - curl
+    - wget
+    - unzip
+    - git
+    - unattended-upgrades
+
+    # ===============================
+    # DESARROLLO NATIVO
+    # ===============================
+    - build-essential
+    - clang
+    - gdb
+    - valgrind
+
+    # ===============================
+    # PYTHON
+    # ===============================
+    - python3
+    - python3-pip
+    - python3-venv
+    - python3-dev
+    - pipx
+
+    # ===============================
+    # UTILIDADES PRODUCTIVIDAD
+    # ===============================
+    - vim
+    - lsd
+    - btop
+    - htop
+    - ncdu
+    - ripgrep
+    - bat
+    - neofetch
+
+  # ==========================================================
+  # SNAPS
+  # ==========================================================
+  snaps:
+    - name: code
+      channel: stable
+      classic: true
+
+  # ==========================================================
+  # CONFIGURACIÓN FINAL
+  # ==========================================================
+  late-commands:
+    # Establecer modo gráfico por defecto
+    - curtin in-target -- systemctl set-default graphical.target
+
+    # Asegurar NetworkManager
+    - curtin in-target -- systemctl enable NetworkManager.service
+    - curtin in-target -- systemctl disable systemd-networkd-wait-online.service
+
+    # SSH Hardening básico
+    - curtin in-target -- sed -i '$a AllowUsers antocreed777' /etc/ssh/sshd_config
+    - curtin in-target -- sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+    - curtin in-target -- systemctl restart ssh
+
+    # Configurar pipx para el usuario
+    - curtin in-target -- sudo -u antocreed777 pipx ensurepath
+
+    # Instalar PDM vía pipx
+    - curtin in-target -- sudo -u antocreed777 pipx install pdm
+
+    # Limpieza final
+    - curtin in-target -- apt autoremove -y
+    - curtin in-target -- apt clean
