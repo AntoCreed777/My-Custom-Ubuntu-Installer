@@ -110,40 +110,6 @@ autoinstall:
       classic: true
 
   # ==========================================================
-  # CONFIGURACIÓN PERSONAL DE COMANDOS Y ALIAS
-  # ==========================================================
-  write_files:
-    - path: /home/antocreed777/.bash_aliases
-      content: |
-        # Visualizacion
-        alias bat='batcat'
-        alias cls='clear'
-
-        # Navegacion
-        alias ..='cd ..'
-        alias ...='cd ../..'
-
-        alias irgit='cd /home/antocreed777/Documentos/GitHub'
-
-        # ls
-        alias ls='lsd --group-dirs first -1'
-        alias ll='ls -AlF --date locale'
-        alias tree='lsd --tree --group-dirs first --depth=2 2>/dev/null'
-
-        # Actualizacion
-        alias actualizar='sudo apt update && sudo apt upgrade -y'
-
-        # Python
-        alias activate='source ./.venv/bin/activate'
-
-        # Git
-        alias gs='git status'
-        alias gaa='git add .'
-        alias gcm='git commit -m'
-      owner: antocreed777:antocreed777
-      permissions: '0644'
-
-  # ==========================================================
   # CONFIGURACIÓN FINAL
   # ==========================================================
   late-commands:
@@ -161,6 +127,39 @@ autoinstall:
     #  Configurar pipx e instalar PDM
     - curtin in-target -- sudo -i -u antocreed777 pipx ensurepath
     - curtin in-target -- sudo -i -u antocreed777 pipx install pdm
+
+    # Alias
+    - |
+      curtin in-target -- bash -c "cat << 'EOF' >> /home/antocreed777/.bash_aliases
+      # Visualizacion
+      alias bat='batcat'
+      alias cls='clear'
+
+      # Navegacion
+      alias ..='cd ..'
+      alias ...='cd ../..'
+
+      alias irgit='cd /home/antocreed777/Documentos/GitHub'
+
+      # ls
+      alias ls='lsd --group-dirs first -1'
+      alias ll='ls -AlF --date locale'
+      alias tree='lsd --tree --group-dirs first --depth=2 2>/dev/null'
+
+      # Actualizacion
+      alias actualizar='sudo apt update && sudo apt upgrade -y'
+
+      # Python
+      alias activate='source ./.venv/bin/activate'
+
+      # Git
+      alias gs='git status'
+      alias gaa='git add .'
+      alias gcm='git commit -m'
+      EOF"
+
+    # Corregir permisos del archivo de alias
+    - curtin in-target -- bash -c "chown antocreed777:antocreed777 /home/antocreed777/.bash_aliases"
 
     # Install Font
     - |
