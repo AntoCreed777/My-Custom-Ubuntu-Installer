@@ -38,7 +38,7 @@ No requiere interacción durante la instalación.
 
 ```bash
 sudo apt update
-sudo apt install xorriso isolinux genisoimage
+sudo apt install xorriso
 ```
 
 ---
