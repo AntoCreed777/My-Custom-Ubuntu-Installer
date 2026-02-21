@@ -39,7 +39,10 @@ autoinstall:
           deb http://archive.ubuntu.com/ubuntu $RELEASE-updates universe
           deb http://security.ubuntu.com/ubuntu $RELEASE-security universe
 
-    updates: security
+  updates: security
+
+  drivers:
+    install: true
 
   # ==========================================================
   # SSH
@@ -135,6 +138,8 @@ autoinstall:
       # Navegacion
       alias ..='cd ..'
       alias ...='cd ../..'
+
+      alias irgit='cd /home/antocreed777/Documentos/GitHub'
 
       # ls
       alias ls='lsd --group-dirs first -1'
