@@ -25,19 +25,7 @@ autoinstall:
     password: "$6$REEMPLAZAR_POR_HASH_REAL"
 
   # ==========================================================
-  # APT CONFIGURATION
   # ==========================================================
-  apt:
-    primary:
-      - arches: [default]
-        uri: http://archive.ubuntu.com/ubuntu
-
-    sources:
-      universe:
-        source: |
-          deb http://archive.ubuntu.com/ubuntu $RELEASE universe
-          deb http://archive.ubuntu.com/ubuntu $RELEASE-updates universe
-          deb http://security.ubuntu.com/ubuntu $RELEASE-security universe
 
   updates: security
 
@@ -99,7 +87,6 @@ autoinstall:
     - ncdu
     - ripgrep
     - bat
-    - neofetch
 
   # ==========================================================
   # SNAPS
@@ -127,6 +114,17 @@ autoinstall:
     #  Configurar pipx e instalar PDM
     - curtin in-target -- sudo -i -u antocreed777 pipx ensurepath
     - curtin in-target -- sudo -i -u antocreed777 pipx install pdm
+
+    # Instalar FastFetch
+    - curtin in-target -- apt-get update
+    - curtin in-target -- apt-get install -y software-properties-common  # Para poder usar el comando add-apt-repository durante la instalacion
+    - curtin in-target -- add-apt-repository -y ppa:zhangsongcui3371/fastfetch
+    - curtin in-target -- apt-get update
+    - curtin in-target -- apt-get install -y fastfetch
+
+    # Crear carpeta para GitHub
+    - curtin in-target -- mkdir -p /home/antocreed777/Documentos/GitHub
+    - curtin in-target -- chown -R antocreed777:antocreed777 /home/antocreed777/Documentos/GitHub
 
     # Alias
     - |
@@ -173,5 +171,5 @@ autoinstall:
       "
 
     # Limpieza final
-    - curtin in-target -- apt autoremove -y
-    - curtin in-target -- apt clean
+    - curtin in-target -- apt-get autoremove -y
+    - curtin in-target -- apt-get clean
