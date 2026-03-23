@@ -100,76 +100,9 @@ autoinstall:
   # CONFIGURACIÓN FINAL
   # ==========================================================
   late-commands:
-    # Establecer modo gráfico por defecto
-    - curtin in-target -- systemctl set-default graphical.target
 
-    # Asegurar NetworkManager
-    - curtin in-target -- systemctl enable NetworkManager.service
-    - curtin in-target -- systemctl disable systemd-networkd-wait-online.service
+  # Clonar repo en que se encuentran los scripts de postinstalación
+  - curtin in-target -- bash -lc 'rm -rf /opt/my-installer && git clone --depth 1 https://github.com/AntoCreed777/My-Custom-Ubuntu-Installer.git /opt/my-installer'
 
-    # SSH Hardening básico
-    - curtin in-target -- sed -i '$a AllowUsers antocreed777' /etc/ssh/sshd_config
-    - curtin in-target -- sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
-
-    #  Configurar pipx e instalar PDM
-    - curtin in-target -- sudo -i -u antocreed777 pipx ensurepath
-    - curtin in-target -- sudo -i -u antocreed777 pipx install pdm
-
-    # Instalar FastFetch
-    - curtin in-target -- apt-get update
-    - curtin in-target -- apt-get install -y software-properties-common  # Para poder usar el comando add-apt-repository durante la instalacion
-    - curtin in-target -- add-apt-repository -y ppa:zhangsongcui3371/fastfetch
-    - curtin in-target -- apt-get update
-    - curtin in-target -- apt-get install -y fastfetch
-
-    # Crear carpeta para GitHub
-    - curtin in-target -- mkdir -p /home/antocreed777/Documentos/GitHub
-    - curtin in-target -- chown -R antocreed777:antocreed777 /home/antocreed777/Documentos/GitHub
-
-    # Alias
-    - |
-      curtin in-target -- bash -c "cat << 'EOF' >> /home/antocreed777/.bash_aliases
-      # Visualizacion
-      alias bat='batcat'
-      alias cls='clear'
-
-      # Navegacion
-      alias ..='cd ..'
-      alias ...='cd ../..'
-
-      alias irgit='cd /home/antocreed777/Documentos/GitHub'
-
-      # ls
-      alias ls='lsd --group-dirs first -1'
-      alias ll='ls -AlF --date locale'
-      alias tree='lsd --tree --group-dirs first --depth=2 2>/dev/null'
-
-      # Actualizacion
-      alias actualizar='sudo apt update && sudo apt upgrade -y'
-
-      # Python
-      alias activate='source ./.venv/bin/activate'
-
-      # Git
-      alias gs='git status'
-      alias gaa='git add .'
-      alias gcm='git commit -m'
-      EOF"
-
-    # Corregir permisos del archivo de alias
-    - curtin in-target -- bash -c "chown antocreed777:antocreed777 /home/antocreed777/.bash_aliases"
-
-    # Install Font
-    - |
-      curtin in-target -- bash -c "
-      mkdir -p /home/antocreed777/.local/share/fonts/
-      wget -O /tmp/FiraCode.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/FiraCode.zip
-      unzip -o /tmp/FiraCode.zip -d /home/antocreed777/.local/share/fonts/
-      chown -R antocreed777:antocreed777 /home/antocreed777/.local/share/fonts/
-      fc-cache -fv
-      rm /tmp/FiraCode.zip
-      "
-
-    # Limpieza final
-    - curtin in-target -- apt-get autoremove -y
-    - curtin in-target -- apt-get clean
+  # Ejecutar el script principal de postinstalación
+  - curtin in-target -- bash -lc 'chmod +x /opt/my-installer/scripts/main.sh && /opt/my-installer/scripts/main.sh --user antocreed777 |& tee /var/log/postinstall.log'
