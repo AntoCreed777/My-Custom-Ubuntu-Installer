@@ -6,9 +6,7 @@ Este repositorio contiene una ISO personalizada de **Ubuntu Server LTS** configu
 
 ## Objetivo
 
-Automatizar completamente la instalación del sistema en mi PC personal.
-
-Formateo con frecuencia y normalmente instalo el mismo conjunto de herramientas y configuraciones. Esta ISO permite:
+Automatizar completamente la instalación del sistema en mi PC personal. Como formateo con frecuencia, esta ISO permite:
 
 * Reducir drásticamente el tiempo de reinstalación.
 * Evitar tareas manuales repetitivas.
@@ -18,7 +16,7 @@ Formateo con frecuencia y normalmente instalo el mismo conjunto de herramientas 
 
 # Qué hace esta ISO
 
-Al arrancar desde la ISO personalizada:
+Al arrancar desde la ISO personalizada, el proceso:
 
 * Instala Ubuntu automáticamente.
 * Configura usuario, red y particionado según `autoinstall.yaml`.
@@ -26,7 +24,65 @@ Al arrancar desde la ISO personalizada:
 * Aplica configuraciones base del sistema.
 * Finaliza sin intervención manual.
 
-No requiere interacción durante la instalación.
+---
+
+# Postinstalación (scripts)
+
+Este repositorio incluye scripts modulares en `scripts/` que se ejecutan desde `late-commands` de `autoinstall.yaml`.
+
+Los scripts están separados en archivos `.sh` para dos modos de uso:
+
+* Durante el autoinstall (ejecución automática).
+* En sistemas ya instalados previamente (ejecución manual, sin reinstalar).
+
+Se pueden reutilizar en cualquier máquina Ubuntu, desde cualquier ruta, definiendo el usuario objetivo con `--user` o con `TARGET_USER`.
+
+Módulos disponibles:
+
+* `systemd`
+* `network`
+* `ssh`
+* `fastfetch`
+* `python`
+* `folders`
+* `aliases`
+* `fonts`
+* `cleanup`
+
+Script principal:
+
+```bash
+sudo /opt/my-installer/scripts/main.sh --user "${SUDO_USER:-$USER}" --only ssh,aliases,fonts --skip fonts
+```
+
+Flags:
+
+* `--user <usuario>`: define el usuario objetivo para módulos que escriben en su home o configuración.
+* `--only <mod1,mod2,...>`: ejecuta solo los módulos indicados.
+* `--skip <mod1,mod2,...>`: excluye módulos del set final a ejecutar.
+
+Precedencia:
+
+* Si combinas `--only` y `--skip`, `--skip` manda al final (si un módulo está en ambos, se omite).
+
+Ejemplo de ejecución manual en un sistema ya instalado:
+
+```bash
+git clone https://github.com/AntoCreed777/My-Custom-Ubuntu-Installer.git /tmp/my-installer
+sudo /tmp/my-installer/scripts/main.sh --user "${SUDO_USER:-$USER}"
+```
+
+Alternativa con variable de entorno:
+
+```bash
+sudo TARGET_USER="${SUDO_USER:-$USER}" /tmp/my-installer/scripts/main.sh
+```
+
+Comportamiento actual del `main.sh`:
+
+* Modo best-effort: si un módulo falla, continúa con los siguientes.
+* Al final muestra resumen con módulos fallidos.
+* El log puede guardarse con `tee`, por ejemplo en `/var/log/postinstall.log`.
 
 ---
 
@@ -173,13 +229,13 @@ En ese caso, simplemente copio `custom_ubuntu.iso` al USB preparado con Ventoy y
 
 ---
 
-## Instalación
+## Ejecución
 
 1. Arrancar desde el USB.
 2. Seleccionar **Autoinstall Ubuntu Server**.
 3. Esperar a que termine automáticamente.
 
-Al finalizar, el sistema queda listo con mis herramientas habituales instaladas.
+Al finalizar, el sistema queda listo con mis herramientas habituales.
 
 ---
 
@@ -189,4 +245,3 @@ Al finalizar, el sistema queda listo con mis herramientas habituales instaladas.
 2. Regenero la ISO.
 3. Formateo.
 4. Instalo sin intervención manual.
-5. Sistema configurado y listo para uso inmediato.

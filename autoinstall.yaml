@@ -102,7 +102,8 @@ autoinstall:
   late-commands:
 
   # Clonar repo en que se encuentran los scripts de postinstalación
-  - curtin in-target -- bash -lc 'rm -rf /opt/my-installer && git clone --depth 1 https://github.com/AntoCreed777/My-Custom-Ubuntu-Installer.git /opt/my-installer'
+  #- curtin in-target -- bash -lc 'rm -rf /opt/my-installer && git clone --depth 1 https://github.com/AntoCreed777/My-Custom-Ubuntu-Installer.git /opt/my-installer'
+  - curtin in-target -- bash -lc 'rm -rf /opt/my-installer && git clone --depth 1 --branch feat/modularizacion --single-branch https://github.com/AntoCreed777/My-Custom-Ubuntu-Installer.git /opt/my-installer'
 
   # Ejecutar el script principal de postinstalación
   - curtin in-target -- bash -lc 'chmod +x /opt/my-installer/scripts/main.sh && /opt/my-installer/scripts/main.sh --user antocreed777 |& tee /var/log/postinstall.log'
