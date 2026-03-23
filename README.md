@@ -84,6 +84,12 @@ Comportamiento actual del `main.sh`:
 * Al final muestra resumen con módulos fallidos.
 * El log puede guardarse con `tee`, por ejemplo en `/var/log/postinstall.log`.
 
+Política de errores y advertencias en módulos:
+
+* Un comando que falla dentro de un módulo debe fallar ese módulo (sin usar silencios como `|| true`).
+* Sólo se permite `WARN` no fatal para casos opcionales explícitos (por ejemplo, un servicio opcional o una herramienta opcional ausente).
+* Los casos opcionales se registran de forma uniforme con helpers comunes (`warn`, `warn_skip`, chequeos previos en `common.sh`).
+
 ---
 
 # Requisitos

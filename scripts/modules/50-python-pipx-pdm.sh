@@ -8,5 +8,9 @@ require_root
 require_user_exists "$TARGET_USER"
 
 log "pipx ensurepath + instalar PDM (si pipx existe)"
-run_as_user "$TARGET_USER" "command -v pipx >/dev/null 2>&1 && pipx ensurepath || true"
-run_as_user "$TARGET_USER" "command -v pipx >/dev/null 2>&1 && pipx install pdm || true"
+if user_has_cmd "$TARGET_USER" "pipx"; then
+	run_as_user "$TARGET_USER" "pipx ensurepath"
+	run_as_user "$TARGET_USER" "pipx install --force pdm"
+else
+	warn_skip "pipx no está instalado para $TARGET_USER"
+fi

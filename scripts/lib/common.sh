@@ -2,6 +2,7 @@
 set -euo pipefail
 
 log() { printf "[postinstall] %s\n" "$*" >&2; }
+warn() { log "WARN: $*"; }
 die() { log "ERROR: $*"; exit 1; }
 
 require_root() {
@@ -23,6 +24,21 @@ home_of() {
 run_as_user() {
   local user="$1"; shift
   runuser -l "$user" -c "$*"
+}
+
+user_has_cmd() {
+  local user="$1"
+  local cmd="$2"
+  run_as_user "$user" "command -v $cmd >/dev/null 2>&1"
+}
+
+service_exists() {
+  local service="$1"
+  systemctl list-unit-files --type=service 2>/dev/null | grep -q "^${service}[[:space:]]"
+}
+
+warn_skip() {
+  warn "$1; se omite"
 }
 
 append_once() {

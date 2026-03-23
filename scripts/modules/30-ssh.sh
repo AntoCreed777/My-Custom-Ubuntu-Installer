@@ -21,4 +21,4 @@ else
     sed -i "s/^\s*AllowUsers\s\+/AllowUsers /; s/^\s*AllowUsers.*/& ${TARGET_USER}/" "$SSHD"
 fi
 
-systemctl restart ssh 2>/dev/null || systemctl restart sshd 2>/dev/null || true
+systemctl restart ssh 2>/dev/null || systemctl restart sshd 2>/dev/null

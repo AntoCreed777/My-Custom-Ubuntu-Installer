@@ -29,7 +29,6 @@ unzip -o "$TMP_ZIP" -d "$HOME_DIR/.local/share/fonts" >/dev/null
 
 chown -R "$TARGET_USER:$TARGET_USER" "$HOME_DIR/.local/share/fonts"
 
-# fc-cache como usuario (si falla no detenemos todo)
-run_as_user "$TARGET_USER" "fc-cache -fv || true"
+run_as_user "$TARGET_USER" "fc-cache -fv"
 
 rm -f "$TMP_ZIP"
