@@ -92,7 +92,14 @@ autoinstall:
   # SNAPS
   # ==========================================================
   snaps:
+    - name: firefox
+      channel: stable
+
     - name: code
+      channel: stable
+      classic: true
+    
+    - name: yazi
       channel: stable
       classic: true
 
@@ -129,9 +136,15 @@ autoinstall:
     # Alias
     - |
       curtin in-target -- bash -c "cat << 'EOF' >> /home/antocreed777/.bash_aliases
-      # Visualizacion
+      # Salir de la terminal
+      alias q='exit'
+
+      # Visualizacion de archivos
       alias bat='batcat'
+
+      # Limpiar pantalla
       alias cls='clear'
+      alias c='clear'
 
       # Navegacion
       alias ..='cd ..'
@@ -168,6 +181,14 @@ autoinstall:
       chown -R antocreed777:antocreed777 /home/antocreed777/.local/share/fonts/
       fc-cache -fv
       rm /tmp/FiraCode.zip
+      "
+
+    # Instalar Starship
+    - |
+      curtin in-target -- bash -c "
+      curl -fsSL https://starship.rs/install.sh | sh -s -- -y
+      echo 'eval "\$(starship init bash)"' >> /home/antocreed777/.bashrc
+      chown antocreed777:antocreed777 /home/antocreed777/.bashrc
       "
 
     # Limpieza final

@@ -91,6 +91,9 @@ iso-work/nocloud/user-data
 
 `meta-data` puede permanecer vacío.
 
+> [!IMPORTANT]
+> Cambiar la contraseña del usuario en el archivo `autoinstall.yaml`. Generar el hash con `mkpasswd -m sha-512` e ingresarlo en la configuración.
+
 ---
 
 ## 4. Modificar GRUB para autoinstall
@@ -125,7 +128,7 @@ cd iso-work
 xorriso -as mkisofs \
   -r \
   -V "UBUNTU_AUTOINSTALL" \
-  -o ../custom_ubuntu.iso \
+  -o ../personal_custom_ubuntu.iso \
   -J -l \
   -iso-level 3 \
   -partition_offset 16 \
@@ -146,7 +149,7 @@ cd ..
 Se generará:
 
 ```
-custom_ubuntu.iso
+personal_custom_ubuntu.iso
 ```
 
 ---
@@ -157,7 +160,7 @@ custom_ubuntu.iso
 
 ```bash
 lsblk
-sudo dd if=custom_ubuntu.iso of=/dev/sdX bs=4M status=progress && sync
+sudo dd if=personal_custom_ubuntu.iso of=/dev/sdX bs=4M status=progress && sync
 ```
 
 > [!WARNING]
@@ -169,7 +172,7 @@ sudo dd if=custom_ubuntu.iso of=/dev/sdX bs=4M status=progress && sync
 
 Yo utilizo **Ventoy**, lo que me permite mantener múltiples ISOs en un mismo USB sin reescribir el dispositivo cada vez.
 
-En ese caso, simplemente copio `custom_ubuntu.iso` al USB preparado con Ventoy y arranco desde allí.
+En ese caso, simplemente copio `personal_custom_ubuntu.iso` al USB preparado con Ventoy y arranco desde allí.
 
 ---
 
