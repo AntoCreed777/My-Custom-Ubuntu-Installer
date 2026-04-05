@@ -127,7 +127,7 @@ cd iso-work
 
 xorriso -as mkisofs \
   -r \
-  -V "UBUNTU_AUTOINSTALL" \
+  -V "Ubuntu 24.04 LTS amd64" \
   -o ../personal_custom_ubuntu.iso \
   -J -l \
   -iso-level 3 \
