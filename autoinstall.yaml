@@ -175,6 +175,12 @@ autoinstall:
     # Corregir permisos del archivo de alias
     - curtin in-target -- bash -c "chown antocreed777:antocreed777 /home/antocreed777/.bash_aliases"
 
+    # Definir atajo para abrir terminal con Super+Enter
+    - |
+      curtin in-target -- bash -c "
+      sudo -u antocreed777 dbus-run-session gsettings set org.gnome.settings-daemon.plugins.media-keys terminal \"['<Super>Return']\"
+      "
+
     # Install Font
     - |
       curtin in-target -- bash -c "
@@ -182,17 +188,43 @@ autoinstall:
       wget -O /tmp/FiraCode.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/FiraCode.zip
       unzip -o /tmp/FiraCode.zip -d /home/antocreed777/.local/share/fonts/
       chown -R antocreed777:antocreed777 /home/antocreed777/.local/share/fonts/
-      fc-cache -fv
+      sudo -u antocreed777 fc-cache -fv
       rm /tmp/FiraCode.zip
       "
 
     # Instalar Starship
+    - curtin in-target -- bash -c "curl -fsSL https://starship.rs/install.sh | sh -s -- -y"
+    - curtin in-target -- sudo -u antocreed777 bash -c "echo 'eval \"\$(starship init bash)\"' >> ~/.bashrc"
+    
+    ### Crear carpeta config y archivo de configuracion de la terminal
+    # Se obtiene usando el siguiente comando en una terminal ya configurada:
+    # dconf dump /org/gnome/terminal/ > terminal.conf
     - |
       curtin in-target -- bash -c "
-      curl -fsSL https://starship.rs/install.sh | sh -s -- -y
-      echo 'eval \"\$(starship init bash)\"' >> /home/antocreed777/.bashrc
-      chown antocreed777:antocreed777 /home/antocreed777/.bashrc
+      mkdir -p /home/antocreed777/.config
+      chown antocreed777:antocreed777 /home/antocreed777/.config
+
+      cat > /home/antocreed777/.config/terminal.conf << 'EOF'
+      [legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9]
+      background-color='rgb(0,0,0)'
+      bold-is-bright=true
+      font='FiraCode Nerd Font Mono 12'
+      foreground-color='rgb(0,255,0)'
+      use-system-font=false
+      use-theme-colors=false
+      EOF
+
+      chown antocreed777:antocreed777 /home/antocreed777/.config/terminal.conf
       "
+
+    # Aplicar configuración de terminal
+    - |
+      curtin in-target -- bash -c "
+      sudo -u antocreed777 dbus-run-session dconf load /org/gnome/terminal/ < /home/antocreed777/.config/terminal.conf
+      "
+
+    # Establecer el perfil recién creado como predeterminado (El UUID del perfil se obtiene del archivo de configuración exportado previamente)
+    - curtin in-target -- sudo -u antocreed777 dbus-run-session gsettings set org.gnome.Terminal.ProfilesList default "'b1dcc9dd-5262-4d8d-a863-c897e6d979b9'"
 
     # Limpieza final
     - curtin in-target -- apt-get autoremove -y
