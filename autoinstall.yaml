@@ -6,52 +6,49 @@
 autoinstall:
   version: 1
 
-  # ==========================================================
-  # LOCALIZACIÓN
-  # ==========================================================
+  # ----------------------------------------------------------
+  # SECCION: LOCALIZACION Y REGIONALIZACION
+  # ----------------------------------------------------------
   locale: es_CL.UTF-8
   timezone: America/Santiago
 
   keyboard:
     layout: latam
 
-  # ==========================================================
-  # IDENTIDAD
-  # ==========================================================
+  # ----------------------------------------------------------
+  # SECCION: IDENTIDAD DEL SISTEMA
+  # ----------------------------------------------------------
   identity:
     hostname: personal-ubuntu
     username: antocreed777
-    # Generar con: mkpasswd -m sha-512
+    # Nota: generar con mkpasswd -m sha-512
     password: "$6$REEMPLAZAR_POR_HASH_REAL"
 
-  # ==========================================================
-  # ==========================================================
+  # ----------------------------------------------------------
+  # SECCION: ACTUALIZACIONES Y CONTROLADORES
+  # ----------------------------------------------------------
 
   updates: security
 
   drivers:
     install: true
 
-  # ==========================================================
-  # SSH
-  # ==========================================================
+  # ----------------------------------------------------------
+  # SECCION: SSH
+  # ----------------------------------------------------------
   ssh:
     install-server: true
     allow-pw: true
 
-  # ==========================================================
-  # PAQUETES
-  # ==========================================================
+  # ----------------------------------------------------------
+  # SECCION: PAQUETES A INSTALAR
+  # ----------------------------------------------------------
   packages:
 
-    # ===============================
-    # GUI
-    # ===============================
+    # Bloque: interfaz grafica
     - ubuntu-desktop-minimal
 
-    # ===============================
-    # SISTEMA BASE
-    # ===============================
+    # Bloque: sistema base
     - ca-certificates
     - gnupg
     - curl
@@ -60,26 +57,20 @@ autoinstall:
     - git
     - unattended-upgrades
 
-    # ===============================
-    # DESARROLLO NATIVO
-    # ===============================
+    # Bloque: desarrollo nativo (C/C++)
     - build-essential
     - clang
     - gdb
     - valgrind
 
-    # ===============================
-    # PYTHON
-    # ===============================
+    # Bloque: python
     - python3
     - python3-pip
     - python3-venv
     - python3-dev
     - pipx
 
-    # ===============================
-    # UTILIDADES PRODUCTIVIDAD
-    # ===============================
+    # Bloque: utilidades de productividad
     - vim
     - lsd
     - btop
@@ -88,9 +79,9 @@ autoinstall:
     - ripgrep
     - bat
 
-  # ==========================================================
-  # SNAPS
-  # ==========================================================
+  # ----------------------------------------------------------
+  # SECCION: SNAPS
+  # ----------------------------------------------------------
   snaps:
     - name: firefox
       channel: stable
@@ -103,37 +94,37 @@ autoinstall:
       channel: stable
       classic: true
 
-  # ==========================================================
-  # CONFIGURACIÓN FINAL
-  # ==========================================================
+  # ----------------------------------------------------------
+  # SECCION: CONFIGURACION FINAL
+  # ----------------------------------------------------------
   late-commands:
-    # Establecer modo gráfico por defecto
+    # Accion: establecer modo grafico por defecto
     - curtin in-target -- systemctl set-default graphical.target
 
-    # Asegurar NetworkManager
+    # Accion: asegurar NetworkManager
     - curtin in-target -- systemctl enable NetworkManager.service
     - curtin in-target -- systemctl disable systemd-networkd-wait-online.service
 
-    # SSH Hardening básico
+    # Accion: endurecimiento basico de SSH (Hardening)
     - curtin in-target -- sed -i '$a AllowUsers antocreed777' /etc/ssh/sshd_config
     - curtin in-target -- sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
 
-    #  Configurar pipx e instalar PDM
+    # Accion: configurar pipx e instalar PDM
     - curtin in-target -- sudo -i -u antocreed777 pipx ensurepath
     - curtin in-target -- sudo -i -u antocreed777 pipx install pdm
 
-    # Instalar FastFetch
+    # Accion: instalar FastFetch
     - curtin in-target -- apt-get update
-    - curtin in-target -- apt-get install -y software-properties-common  # Para poder usar el comando add-apt-repository durante la instalacion
+    - curtin in-target -- apt-get install -y software-properties-common  # Requerido para usar add-apt-repository durante la instalacion
     - curtin in-target -- add-apt-repository -y ppa:zhangsongcui3371/fastfetch
     - curtin in-target -- apt-get update
     - curtin in-target -- apt-get install -y fastfetch
 
-    # Crear carpeta para GitHub
+    # Accion: crear carpeta para GitHub
     - curtin in-target -- mkdir -p /home/antocreed777/Documentos/GitHub
     - curtin in-target -- chown -R antocreed777:antocreed777 /home/antocreed777/Documentos/GitHub
 
-    # Alias
+    # Accion: definir alias de shell
     - |
       curtin in-target -- bash -c "cat << 'EOF' >> /home/antocreed777/.bash_aliases
       # Salir de la terminal
@@ -172,16 +163,16 @@ autoinstall:
 
       EOF"
 
-    # Corregir permisos del archivo de alias
+    # Accion: corregir permisos del archivo de alias
     - curtin in-target -- bash -c "chown antocreed777:antocreed777 /home/antocreed777/.bash_aliases"
-
-    # Definir atajo para abrir terminal con Super+Enter
+    
+    # Accion: definir atajo para abrir terminal con Super+Enter
     - |
       curtin in-target -- bash -c "
       sudo -u antocreed777 dbus-run-session gsettings set org.gnome.settings-daemon.plugins.media-keys terminal \"['<Super>Return']\"
       "
 
-    # Install Font
+    # Accion: instalar fuentes (FiraCode Nerd Font Mono)
     - |
       curtin in-target -- bash -c "
       mkdir -p /home/antocreed777/.local/share/fonts/
@@ -192,12 +183,12 @@ autoinstall:
       rm /tmp/FiraCode.zip
       "
 
-    # Instalar Starship
+    # Accion: instalar Starship
     - curtin in-target -- bash -c "curl -fsSL https://starship.rs/install.sh | sh -s -- -y"
     - curtin in-target -- sudo -u antocreed777 bash -c "echo 'eval \"\$(starship init bash)\"' >> ~/.bashrc"
     
-    ### Crear carpeta config y archivo de configuracion de la terminal
-    # Se obtiene usando el siguiente comando en una terminal ya configurada:
+    # Accion: crear carpeta config y archivo de configuracion de la terminal
+    # Nota: se obtiene usando este comando en una terminal ya configurada:
     # dconf dump /org/gnome/terminal/ > terminal.conf
     - |
       curtin in-target -- bash -c "
@@ -217,15 +208,16 @@ autoinstall:
       chown antocreed777:antocreed777 /home/antocreed777/.config/terminal.conf
       "
 
-    # Aplicar configuración de terminal
+    # Accion: aplicar configuracion de terminal
     - |
       curtin in-target -- bash -c "
       sudo -u antocreed777 dbus-run-session dconf load /org/gnome/terminal/ < /home/antocreed777/.config/terminal.conf
       "
 
-    # Establecer el perfil recién creado como predeterminado (El UUID del perfil se obtiene del archivo de configuración exportado previamente)
+    # Accion: establecer el perfil recien creado como predeterminado
+    # Nota: el UUID del perfil se obtiene del archivo de configuracion exportado previamente
     - curtin in-target -- sudo -u antocreed777 dbus-run-session gsettings set org.gnome.Terminal.ProfilesList default "'b1dcc9dd-5262-4d8d-a863-c897e6d979b9'"
 
-    # Limpieza final
+    # Accion: limpieza final
     - curtin in-target -- apt-get autoremove -y
     - curtin in-target -- apt-get clean
