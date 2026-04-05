@@ -167,6 +167,9 @@ autoinstall:
       alias gs='git status'
       alias gaa='git add .'
       alias gcm='git commit -m'
+      alias gps='git push'
+      alias gpl='git pull'
+
       EOF"
 
     # Corregir permisos del archivo de alias
