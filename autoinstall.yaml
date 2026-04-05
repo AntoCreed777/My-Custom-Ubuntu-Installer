@@ -175,11 +175,10 @@ autoinstall:
     # Accion: instalar fuentes (FiraCode Nerd Font Mono)
     - |
       curtin in-target -- bash -c "
-      mkdir -p /home/antocreed777/.local/share/fonts/
-      wget -O /tmp/FiraCode.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/FiraCode.zip
-      unzip -o /tmp/FiraCode.zip -d /home/antocreed777/.local/share/fonts/
-      chown -R antocreed777:antocreed777 /home/antocreed777/.local/share/fonts/
-      sudo -u antocreed777 fc-cache -fv
+      mkdir -p /usr/local/share/fonts/FiraCodeNerdFont
+      wget -qO /tmp/FiraCode.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/FiraCode.zip
+      unzip -o /tmp/FiraCode.zip '*.ttf' -d /usr/local/share/fonts/FiraCodeNerdFont/
+      fc-cache -fv
       rm /tmp/FiraCode.zip
       "
 
