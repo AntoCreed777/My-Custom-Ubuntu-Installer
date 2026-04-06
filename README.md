@@ -2,52 +2,50 @@
 
 Este repositorio contiene una ISO personalizada de **Ubuntu Server LTS** configurada para instalación automática mediante `autoinstall` (Subiquity + Cloud-Init NoCloud).
 
----
-
 ## Objetivo
 
 Automatizar completamente la instalación del sistema en mi PC personal.
 
 Formateo con frecuencia y normalmente instalo el mismo conjunto de herramientas y configuraciones. Esta ISO permite:
 
-* Reducir drásticamente el tiempo de reinstalación.
-* Evitar tareas manuales repetitivas.
-* Mantener un entorno consistente.
+- Reducir drásticamente el tiempo de reinstalación.
+- Evitar tareas manuales repetitivas.
+- Mantener un entorno consistente.
 
----
-
-# Qué hace esta ISO
+## Qué hace esta ISO
 
 Al arrancar desde la ISO personalizada:
 
-* Instala Ubuntu automáticamente.
-* Configura usuario, red y particionado según `autoinstall.yaml`.
-* Instala mis herramientas habituales.
-* Aplica configuraciones base del sistema.
-* Finaliza sin intervención manual.
+- Instala Ubuntu automáticamente.
+- Configura usuario, red y particionado según `autoinstall.yaml`.
+- Instala las herramientas habituales.
+- Aplica configuraciones base del sistema.
+- Finaliza sin intervención manual.
 
 No requiere interacción durante la instalación.
 
----
+## Requisitos
 
-# Requisitos
+- ISO original de Ubuntu Server LTS.
+- Archivo `autoinstall.yaml` adaptado a la configuración deseada.
+- Conexión a Internet por cable de red (Ethernet), activa y estable durante toda la instalación.
+- Herramientas necesarias:
 
-* ISO original de Ubuntu Server LTS.
-* Archivo `autoinstall.yaml` adaptado a mi configuración.
-* Herramientas necesarias:
-
-```bash
+```sh
 sudo apt update
 sudo apt install xorriso
 ```
 
----
+> [!IMPORTANT]
+> Esta instalación ejecuta múltiples tareas que dependen de Internet.
+> Es imprescindible iniciar el sistema con cable de red conectado y verificar que la conexión sea estable.
+> Si la conexión se interrumpe durante el proceso, el instalador puede fallar.
 
-# Construcción de la ISO Personalizada
+## Construcción de la ISO personalizada
 
-## 1. Preparar entorno
+### 1. Preparar entorno
 
-```bash
+```sh
 mkdir -p ~/autoinstall-iso
 cd ~/autoinstall-iso
 
@@ -55,23 +53,19 @@ sudo mkdir -p /mnt/iso
 sudo mount -o loop ORIGINAL_ISO.iso /mnt/iso
 ```
 
----
+### 2. Copiar contenido de la ISO
 
-## 2. Copiar contenido de la ISO
-
-```bash
+```sh
 mkdir iso-work
 cp -rT /mnt/iso iso-work
 sudo umount /mnt/iso
 ```
 
----
-
-## 3. Agregar configuración NoCloud
+### 3. Agregar configuración NoCloud
 
 Crear estructura:
 
-```bash
+```sh
 mkdir -p iso-work/nocloud
 touch iso-work/nocloud/meta-data
 touch iso-work/nocloud/user-data
@@ -79,34 +73,32 @@ touch iso-work/nocloud/user-data
 
 Copiar el contenido de:
 
-```
+```text
 autoinstall.yaml
 ```
 
 dentro de:
 
-```
+```text
 iso-work/nocloud/user-data
 ```
 
 `meta-data` puede permanecer vacío.
 
 > [!IMPORTANT]
-> Cambiar la contraseña del usuario en el archivo `autoinstall.yaml`. Generar el hash con `mkpasswd -m sha-512` e ingresarlo en la configuración.
+> Cambie la contraseña del usuario en `autoinstall.yaml`. Genere el hash con `mkpasswd -m sha-512` e ingréselo en la configuración.
 
----
-
-## 4. Modificar GRUB para autoinstall
+### 4. Modificar GRUB para autoinstall
 
 Editar:
 
-```bash
+```sh
 vim iso-work/boot/grub/grub.cfg
 ```
 
 Agregar o modificar la entrada:
 
-```
+```conf
 set timeout=5
 
 menuentry "Autoinstall Ubuntu Server" {
@@ -118,11 +110,9 @@ menuentry "Autoinstall Ubuntu Server" {
 
 Esto indica al kernel que active el modo `autoinstall` y utilice el datasource local `nocloud`.
 
----
+### 5. Generar ISO personalizada
 
-## 5. Generar ISO personalizada
-
-```bash
+```sh
 cd iso-work
 
 xorriso -as mkisofs \
@@ -148,17 +138,15 @@ cd ..
 
 Se generará:
 
-```
+```text
 personal_custom_ubuntu.iso
 ```
 
----
+## Preparación del medio de instalación
 
-# Instalación Rápida
+### Opción 1 — Grabar en USB con `dd`
 
-## Opción 1 — Grabar en USB con `dd`
-
-```bash
+```sh
 lsblk
 sudo dd if=personal_custom_ubuntu.iso of=/dev/sdX bs=4M status=progress && sync
 ```
@@ -166,17 +154,17 @@ sudo dd if=personal_custom_ubuntu.iso of=/dev/sdX bs=4M status=progress && sync
 > [!WARNING]
 > ⚠️ Esto borra completamente el contenido del USB.
 
----
-
-## Opción 2 — Usar Ventoy (recomendado en mi caso)
+### Opción 2 — Usar Ventoy (recomendado en mi caso)
 
 Yo utilizo **Ventoy**, lo que me permite mantener múltiples ISOs en un mismo USB sin reescribir el dispositivo cada vez.
 
 En ese caso, simplemente copio `personal_custom_ubuntu.iso` al USB preparado con Ventoy y arranco desde allí.
 
----
+### Instalación
 
-## Instalación
+> [!WARNING]
+> Antes de iniciar, confirme que el equipo está conectado por Ethernet y que la conexión a Internet es estable.
+> Si la conexión se corta durante la instalación, el proceso puede fallar.
 
 1. Arrancar desde el USB.
 2. Seleccionar **Autoinstall Ubuntu Server**.
@@ -184,9 +172,7 @@ En ese caso, simplemente copio `personal_custom_ubuntu.iso` al USB preparado con
 
 Al finalizar, el sistema queda listo con mis herramientas habituales instaladas.
 
----
-
-# Flujo de Uso Habitual
+## Flujo de uso habitual
 
 1. Modifico `autoinstall.yaml` si agrego nuevas herramientas.
 2. Regenero la ISO.
